@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Tests\OrgChartTests\OrgChartTests.csproj" />
   </ItemGroup>
 
 </Project>
