@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32630.192
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrgChart", "src\OrgChart\OrgChart.csproj", "{E056D114-1CBD-4AAE-9D01-2EAF3E93AA89}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{D38C2888-CDF6-42BC-899B-74D6AECC80F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrgChartTests", "src\Tests\OrgChartTests\OrgChartTests.csproj", "{32FB4686-38AD-485F-B651-CC197EA1ADA6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E056D114-1CBD-4AAE-9D01-2EAF3E93AA89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E056D114-1CBD-4AAE-9D01-2EAF3E93AA89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E056D114-1CBD-4AAE-9D01-2EAF3E93AA89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E056D114-1CBD-4AAE-9D01-2EAF3E93AA89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32FB4686-38AD-485F-B651-CC197EA1ADA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32FB4686-38AD-485F-B651-CC197EA1ADA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32FB4686-38AD-485F-B651-CC197EA1ADA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32FB4686-38AD-485F-B651-CC197EA1ADA6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{32FB4686-38AD-485F-B651-CC197EA1ADA6} = {D38C2888-CDF6-42BC-899B-74D6AECC80F5}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6B94909F-9F19-4BB5-9FCF-4035ACDDA5C4}
+	EndGlobalSection
+EndGlobal
