@@ -9,17 +9,25 @@ namespace IntrepidProducts.OrgChart
 
     public abstract class EntityAbstract : IHasId
     {
+        protected EntityAbstract() : this(Guid.NewGuid())
+        {}
+
         protected EntityAbstract(Guid id)
         {
             if (id == Guid.Empty)
             {
-                throw new ArgumentException("Cannot initiate Entity with an Empty Guid");
+                throw new ArgumentException("Entity ID is invalid");
             }
 
             Id = id;
         }
 
         public Guid Id { get; }
+
+        public virtual bool IsValid()
+        {
+            return true;
+        }
 
         #region Equality
         public override bool Equals(object obj)
