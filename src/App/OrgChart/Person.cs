@@ -6,6 +6,9 @@ namespace IntrepidProducts.OrgChart
 {
     public class Person : EntityAbstract
     {
+        public Person()
+        {}
+
         public Person(Guid id) : base(id)
         {}
 
@@ -24,9 +27,21 @@ namespace IntrepidProducts.OrgChart
         public IEnumerable<Person> DirectReports => _directReports;
         public bool IsManager => DirectReports.Any();
 
-        public bool AddDirectReport(Person person)
+        public bool AddDirectReport(params Person[] persons)
         {
-            //TODO: Check if Person is valid
+            foreach (var person in persons)
+            {
+                if (!AddDirectReport(person))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private bool AddDirectReport(Person person)
+        {
             if (_directReports.Contains(person))
             {
                 return false;
@@ -46,5 +61,28 @@ namespace IntrepidProducts.OrgChart
             return _directReports.Remove(person);
         }
         #endregion
+
+        public override bool IsValid()
+        {
+            if (String.IsNullOrWhiteSpace(FirstName))
+            {
+                return false;
+            }
+
+            if (String.IsNullOrWhiteSpace(LastName))
+            {
+                return false;
+            }
+
+            foreach (var directReport in DirectReports)
+            {
+                if (!directReport.IsValid())
+                {
+                    return false;
+                }
+            }
+
+            return ReportsTo == null || ReportsTo.IsValid();
+        }
     }
 }
