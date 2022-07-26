@@ -1,13 +1,16 @@
 ﻿using System;
 
-namespace IntrepidProducts.OrgChart
+namespace IntrepidProducts.Repo.Entities
 {
     public interface IHasId
     {
         Guid Id { get; }
     }
 
-    public abstract class EntityAbstract : IHasId
+    public interface IEntity : IHasId
+    { }
+
+    public abstract class EntityAbstract : IEntity
     {
         protected EntityAbstract() : this(Guid.NewGuid())
         {}

@@ -1,6 +1,7 @@
+using IntrepidProducts.Repo.Entities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace IntrepidProducts.OrgChart.Tests
+namespace IntrepidProducts.Repo.Tests
 {
     [TestClass]
     public class PersonTest

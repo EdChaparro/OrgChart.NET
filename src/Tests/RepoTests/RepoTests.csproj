@@ -5,9 +5,9 @@
 
     <IsPackable>false</IsPackable>
 
-    <AssemblyName>IntrepidProducts.OrgChart.Tests</AssemblyName>
+    <AssemblyName>IntrepidProducts.Repo.Tests</AssemblyName>
 
-    <RootNamespace>IntrepidProducts.OrgChart.Tests</RootNamespace>
+    <RootNamespace>IntrepidProducts.Repo.Tests</RootNamespace>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\App\OrgChart\OrgChart.csproj" />
+    <ProjectReference Include="..\..\App\Repo\Repo.csproj" />
   </ItemGroup>
 
 </Project>
