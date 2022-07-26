@@ -1,5 +1,6 @@
-﻿using System;
-using IntrepidProducts.Repo.Entities;
+﻿using System.Collections.Generic;
+using System.Linq;
+using IntrepidProducts.Repo.Records;
 using Microsoft.EntityFrameworkCore;
 
 namespace IntrepidProducts.Repo
@@ -9,58 +10,50 @@ namespace IntrepidProducts.Repo
         int Create(TEntity entity);
         int Update(TEntity entity);
         int Delete(TEntity entity);
-        TEntity? FindById(Guid id);
+        TEntity? Find(TEntity entity);
     }
 
-    public abstract class DbContextAbstract<TEntity> : DbContext, IDbContext<TEntity>
+    public abstract class DbContextAbstract<TEntity, TRecord> : DbContext, IDbContext<TEntity>
         where TEntity : class, IEntity
+        where TRecord : class, IRecord, new()
     {
         protected DbContextAbstract(DbContextOptions dbContextOptions)
             : base(dbContextOptions)
         { }
 
-        protected DbSet<TEntity> DbSet { get; set; }
+        protected abstract IEnumerable<TRecord> Convert(TEntity entity);
 
-        public int Create(TEntity entity)
+        protected DbSet<TRecord> DbSet { get; set; }
+
+        public virtual int Create(TEntity entity)
         {
-            DbSet.Add(entity);
+            DbSet.Add(Convert(entity).First());
             return SaveChanges();
         }
 
-        public int Update(TEntity entity)
+        public virtual int Update(TEntity entity)
         {
-            var item = FindById(entity.Id);
+            var item = Find(entity);
             if (item == null)
             {
                 return 0;
             }
 
-            var isDetached = DbContextExtensions.DetachLocal
-                (this, entity, EntityState.Modified);
-
-            if (!isDetached)
-            {
-                return 0;
-            }
-
-            //DbSet.Update(entity); //Removed due to EF tracking issues in WebApp
+            DbSet.Update(Convert(entity).First());
             return SaveChanges();
         }
 
-        public TEntity? FindById(Guid id)
-        {
-            return DbSet.Find(id);
-        }
+        public abstract TEntity? Find(TEntity entity);
 
-        public int Delete(TEntity entity)
+        public virtual int Delete(TEntity entity)
         {
-            var item = FindById(entity.Id);
+            var item = Find(entity);
             if (item == null)
             {
                 return 0;
             }
 
-            DbSet.Remove(entity);
+            DbSet.Remove(Convert(entity).First());
             return SaveChanges();
         }
 

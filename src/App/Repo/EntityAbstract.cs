@@ -1,12 +1,7 @@
 ﻿using System;
 
-namespace IntrepidProducts.Repo.Entities
+namespace IntrepidProducts.Repo
 {
-    public interface IHasId
-    {
-        Guid Id { get; }
-    }
-
     public interface IEntity : IHasId
     { }
 

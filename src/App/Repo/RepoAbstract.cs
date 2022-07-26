@@ -1,14 +1,10 @@
-﻿using System;
-using IntrepidProducts.Repo.Entities;
-
-namespace IntrepidProducts.Repo
+﻿namespace IntrepidProducts.Repo
 {
     public interface IRepository<TEntity> where TEntity : class, IEntity
     {
         int Create(TEntity entity);
         int Update(TEntity entity);
         int Delete(TEntity entity);
-        TEntity? FindById(Guid id);
     }
 
     public abstract class RepoAbstract<TEntity, TDbContext> : IRepository<TEntity>
@@ -37,9 +33,9 @@ namespace IntrepidProducts.Repo
             return DbContext.Delete(entity);
         }
 
-        public virtual TEntity? FindById(Guid id)
+        public virtual TEntity? FindById(TEntity entity)
         {
-            return DbContext.FindById(id);
+            return DbContext.Find(entity);
         }
     }
 }

@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\App\Repo\Repo.csproj" />
+    <ProjectReference Include="..\..\App\OrgChart\OrgChart.csproj" />
   </ItemGroup>
 
 </Project>
