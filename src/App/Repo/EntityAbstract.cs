@@ -30,7 +30,9 @@ namespace IntrepidProducts.Repo
         #region Equality
         public override bool Equals(object obj)
         {
-            return Id.Equals(obj);
+            var otherEntity = obj as EntityAbstract;
+
+            return otherEntity != null && otherEntity.Id == Id;
         }
 
         protected bool Equals(EntityAbstract other)

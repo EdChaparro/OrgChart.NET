@@ -1,11 +1,12 @@
 using IntrepidProducts.Repo.Entities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace IntrepidProducts.Repo.Tests
+namespace IntrepidProducts.RepoTests.Entities
 {
     [TestClass]
     public class PersonTest
     {
+        #region Validation
         [TestMethod]
         public void ShouldFailValidationWhenFirstNameMissing()
         {
@@ -25,17 +26,9 @@ namespace IntrepidProducts.Repo.Tests
         [TestMethod]
         public void ShouldPassValidationWhenFirstAndLastNameProvided()
         {
-            var p = new Person { FirstName = "John", LastName = "Doe"};
-
-            Assert.IsTrue(p.IsValid());
-        }
-
-        [TestMethod]
-        public void ShouldProperlyFormatFullName()
-        {
             var p = new Person { FirstName = "John", LastName = "Doe" };
 
-            Assert.AreEqual("John Doe", p.FullName);
+            Assert.IsTrue(p.IsValid());
         }
 
         [TestMethod]
@@ -70,6 +63,26 @@ namespace IntrepidProducts.Repo.Tests
 
             Assert.IsTrue(p.IsValid());
         }
+        #endregion
 
+        [TestMethod]
+        public void ShouldProperlyFormatFullName()
+        {
+            var p = new Person { FirstName = "John", LastName = "Doe" };
+
+            Assert.AreEqual("John Doe", p.FullName);
+        }
+
+        [TestMethod]
+        public void ShouldMaintainDirectReportCount()
+        {
+            var p = new Person { FirstName = "John", LastName = "Doe" };
+            Assert.AreEqual(0, p.DirectReportCount);
+
+            var dr = new Person { FirstName = "Dave", LastName = "Smith" };
+
+            p.AddDirectReport(dr);
+            Assert.AreEqual(1, p.DirectReportCount);
+        }
     }
 }

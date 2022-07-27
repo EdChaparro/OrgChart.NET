@@ -27,6 +27,8 @@ namespace IntrepidProducts.Repo.Entities
         public IEnumerable<Person> DirectReports => _directReports;
         public bool IsManager => DirectReports.Any();
 
+        public int DirectReportCount => DirectReports.Count();
+
         public bool AddDirectReport(params Person[] persons)
         {
             foreach (var person in persons)
@@ -83,6 +85,11 @@ namespace IntrepidProducts.Repo.Entities
             }
 
             return ReportsTo == null || ReportsTo.IsValid();
+        }
+
+        public override string ToString()
+        {
+            return $"{FullName}, {Id}";
         }
     }
 }

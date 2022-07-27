@@ -32,10 +32,5 @@
         {
             return DbContext.Delete(entity);
         }
-
-        public virtual TEntity? FindById(TEntity entity)
-        {
-            return DbContext.Find(entity);
-        }
     }
 }

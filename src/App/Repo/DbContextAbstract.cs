@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using IntrepidProducts.Repo.Records;
+﻿using IntrepidProducts.Repo.Records;
 using Microsoft.EntityFrameworkCore;
 
 namespace IntrepidProducts.Repo
@@ -21,13 +19,16 @@ namespace IntrepidProducts.Repo
             : base(dbContextOptions)
         { }
 
-        protected abstract IEnumerable<TRecord> Convert(TEntity entity);
+        protected abstract TRecord Convert(TEntity entity);
+        protected abstract TEntity Convert(TRecord record);
+
+        protected virtual string DatabaseName => "Database";
 
         protected DbSet<TRecord> DbSet { get; set; }
 
         public virtual int Create(TEntity entity)
         {
-            DbSet.Add(Convert(entity).First());
+            DbSet.Add(Convert(entity));
             return SaveChanges();
         }
 
@@ -39,7 +40,7 @@ namespace IntrepidProducts.Repo
                 return 0;
             }
 
-            DbSet.Update(Convert(entity).First());
+            DbSet.Update(Convert(entity));
             return SaveChanges();
         }
 
@@ -53,7 +54,7 @@ namespace IntrepidProducts.Repo
                 return 0;
             }
 
-            DbSet.Remove(Convert(entity).First());
+            DbSet.Remove(Convert(entity));
             return SaveChanges();
         }
 
@@ -61,7 +62,7 @@ namespace IntrepidProducts.Repo
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseInMemoryDatabase("Exercise");
+                optionsBuilder.UseInMemoryDatabase(DatabaseName);
             }
         }
     }
