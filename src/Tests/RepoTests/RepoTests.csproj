@@ -5,9 +5,9 @@
 
     <IsPackable>false</IsPackable>
 
-    <AssemblyName>IntrepidProducts.OrgChart.Tests</AssemblyName>
+    <AssemblyName>IntrepidProducts.$(MSBuildProjectName)</AssemblyName>
 
-    <RootNamespace>IntrepidProducts.OrgChart.Tests</RootNamespace>
+    <RootNamespace>IntrepidProducts.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 

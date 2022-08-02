@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace IntrepidProducts.OrgChart
+namespace IntrepidProducts.Repo.Entities
 {
     public class Person : EntityAbstract
     {
@@ -12,12 +12,12 @@ namespace IntrepidProducts.OrgChart
         public Person(Guid id) : base(id)
         {}
 
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
 
         public string FullName => $"{FirstName} {LastName}";
 
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         public Person? ReportsTo { get; set; }
         public bool IsManaged => ReportsTo != null;
@@ -26,6 +26,8 @@ namespace IntrepidProducts.OrgChart
         private readonly List<Person> _directReports = new List<Person>();
         public IEnumerable<Person> DirectReports => _directReports;
         public bool IsManager => DirectReports.Any();
+
+        public int DirectReportCount => DirectReports.Count();
 
         public bool AddDirectReport(params Person[] persons)
         {
@@ -83,6 +85,11 @@ namespace IntrepidProducts.OrgChart
             }
 
             return ReportsTo == null || ReportsTo.IsValid();
+        }
+
+        public override string ToString()
+        {
+            return $"{FullName}, {Id}";
         }
     }
 }

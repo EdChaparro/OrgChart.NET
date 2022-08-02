@@ -1,13 +1,11 @@
 ﻿using System;
 
-namespace IntrepidProducts.OrgChart
+namespace IntrepidProducts.Repo
 {
-    public interface IHasId
-    {
-        Guid Id { get; }
-    }
+    public interface IEntity : IHasId
+    { }
 
-    public abstract class EntityAbstract : IHasId
+    public abstract class EntityAbstract : IEntity
     {
         protected EntityAbstract() : this(Guid.NewGuid())
         {}
@@ -32,7 +30,9 @@ namespace IntrepidProducts.OrgChart
         #region Equality
         public override bool Equals(object obj)
         {
-            return Id.Equals(obj);
+            var otherEntity = obj as EntityAbstract;
+
+            return otherEntity != null && otherEntity.Id == Id;
         }
 
         protected bool Equals(EntityAbstract other)
