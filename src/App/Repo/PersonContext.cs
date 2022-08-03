@@ -8,11 +8,17 @@ using Microsoft.EntityFrameworkCore;
 namespace IntrepidProducts.Repo
 {
     public interface IPersonContext : IDbContext<Person>
-    {}
+    {
+        bool PersistDirectReport(Person manager, Guid directReportId);
+        ManagerRecord? FindManager(Guid directReportId);
+        IEnumerable<Person> FindDirectReports(Guid managerId);
+    }
 
     public class PersonContext : DbContextAbstract<Person, PersonRecord>, IPersonContext
     {
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public PersonContext()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
             : base(new DbContextOptions<PersonContext>())
         {}
 
@@ -35,98 +41,52 @@ namespace IntrepidProducts.Repo
                 return 0;
             }
 
-            var createResult = base.Create(entity);
-
-            if (createResult < 1)
-            {
-                return 0;
-            }
-
-            var managerCreateResult = PersistManager(entity);
-
-            var directReportsCreateResult = PersistDirectReports(entity);
-
-            return 1;
-        }
-
-        private bool PersistManager(Person entity)
-        {
-            if (!entity.IsManaged)
-            {
-                return true;
-            }
-
-            var managerRecord = ManagerRecord.Convert(entity.ReportsTo, entity);
-
-            if (managerRecord == null)
-            {
-                return false;
-            }
-
-            var managerPerson = Find(new Person(managerRecord.ManagerPersonId));
-            if (managerPerson == null)
-            {
-                managerPerson = new Person(managerRecord.ManagerPersonId)
-                {
-                    FirstName = entity.FirstName,
-                    LastName = entity.LastName
-                };
-
-                var managerCreateResult =  Create(managerPerson);
-
-               if (managerCreateResult < 1)
-               {
-                   return false;
-               }
-            }
-
-            ManagerDbSet.Add(managerRecord);
-            var result = SaveChanges();
-
-            return result > 0;
-        }
-
-        private bool PersistDirectReports(Person entity)
-        {
-            if (!entity.IsManager)
-            {
-                return true;
-            }
-
-            var directReportsAdded = 0;
-
-            foreach (var dr in entity.DirectReports)
-            {
-                var drPerson = Find(new Person(dr.Id));
-
-                if (drPerson == null)
-                {
-                    var drCreateResult = Create(dr);
-
-                    if (drCreateResult < 1)
-                    {
-                        return false;
-                    }
-                }
-
-                var managerRecord = ManagerRecord.Convert(entity, dr);
-
-                ManagerDbSet.Add(managerRecord);
-                directReportsAdded++;
-            }
-
-            if (directReportsAdded > 0)
-            {
-                var result = SaveChanges();
-                return result > 0;
-            }
-
-            return false;
+            return base.Create(entity);
         }
 
         public override Person? Find(Person entity)
         {
             return FindById(entity.Id);
+        }
+
+        private bool IsRelationshipValid(Person manager, Guid directReportId)
+        {
+            if (manager.Id == directReportId)
+            {
+                return false;
+            }
+
+            var persistedManager = FindById(manager.Id);
+            var directReport = FindById(directReportId);
+
+            return persistedManager != null && directReport != null;
+        }
+
+        public bool PersistDirectReport(Person manager, Guid directReportId)
+        {
+            if (!IsRelationshipValid(manager, directReportId))
+            {
+                return false;
+            }
+
+            var presentManagerRecord = FindManager(directReportId);
+            if (presentManagerRecord != null)
+            {
+                if (presentManagerRecord.ManagerPersonId == manager.Id)
+                {
+                    return true;
+                }
+
+                ManagerDbSet.Remove(presentManagerRecord);
+            }
+
+            var newManagerRecord = new ManagerRecord
+                { DirectReportPersonId = directReportId, ManagerPersonId = manager.Id };
+
+            ManagerDbSet.Add(newManagerRecord);
+            var result = SaveChanges();
+
+            return result > 0;
         }
 
         private Person? FindById(Guid id)
@@ -138,39 +98,26 @@ namespace IntrepidProducts.Repo
                 return null;
             }
 
-            var person = Convert(record);
-
-            person.ReportsTo = FindManager(person);
-
-            var directReports = FindDirectReports(person);
-
-            foreach (var dr in directReports)
-            {
-                person.AddDirectReport(dr);
-            }
-
-            return person;
+            return Convert(record);
         }
 
-        private Person? FindManager(Person person)
+        public ManagerRecord? FindManager(Guid directReportId)
         {
-            var managerRecord = ManagerDbSet
-                .FirstOrDefault(x => x.DirectReportPersonId == person.Id);
-
-            if (managerRecord != null)
-            {
-                return Find(new Person(managerRecord.ManagerPersonId));
-            }
-
-            return null;
+            return ManagerDbSet
+                .FirstOrDefault(x => x.DirectReportPersonId == directReportId);
         }
 
-        private IEnumerable<Person> FindDirectReports(Person manager)
+        private ManagerRecord? FindManager(Person person)
+        {
+            return FindManager(person.Id);
+        }
+
+        public IEnumerable<Person> FindDirectReports(Guid  managerId)
         {
             var directReports = new List<Person>();
 
             var directReportRecords = ManagerDbSet
-                .Where(x => x.ManagerPersonId == manager.Id);
+                .Where(x => x.ManagerPersonId == managerId);
 
             foreach (var directReportRecord in directReportRecords)
             {
@@ -183,7 +130,6 @@ namespace IntrepidProducts.Repo
                         {
                             FirstName = directReport.FirstName,
                             LastName = directReport.LastName,
-                            ReportsTo = manager
                         });
                 }
             }

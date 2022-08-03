@@ -24,7 +24,7 @@ namespace IntrepidProducts.OrgChart
 
         public int DirectReportCount => DirectReports.Count();
 
-        public bool AddDirectReport(params OrgChart[] persons)
+        public bool AddDirectReport(params Person[] persons)
         {
             foreach (var person in persons)
             {
@@ -46,16 +46,6 @@ namespace IntrepidProducts.OrgChart
 
             _directReports.Add(person);
             return true;
-        }
-
-        public bool RemoveDirectReport(Person person)
-        {
-            if (!_directReports.Contains(person))
-            {
-                return false;
-            }
-
-            return _directReports.Remove(person);
         }
         #endregion
 
