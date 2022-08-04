@@ -9,8 +9,9 @@ namespace IntrepidProducts.RepoTests.Entities
     [TestClass]
     public class PersonRepoTest
     {
+        #region Create
         [TestMethod]
-        public void ShouldSupportCreate()
+        public void ShouldSupportPersonCreate()
         {
             var repo = new PersonRepo();
 
@@ -26,7 +27,7 @@ namespace IntrepidProducts.RepoTests.Entities
         }
 
         [TestMethod]
-        public void ShouldNotCreateWhenEntityNotValid()
+        public void ShouldNotCreatePersonWhenInvalid()
         {
             var repo = new PersonRepo();
 
@@ -40,61 +41,87 @@ namespace IntrepidProducts.RepoTests.Entities
             Assert.AreEqual(0, count);  //Nothing created
         }
 
+        #region Manager
         [TestMethod]
         public void ShouldPersistManager()
         {
             var repo = new PersonRepo();
 
-            var manager = new Person
-            {
-                FirstName = "Dave",
-                LastName = "Smith"
-            };
-
             var person = new Person
             {
                 FirstName = "John",
                 LastName = "Doe",
-                ReportsTo = manager
+                Title = "Clerk"
             };
+            repo.Create(person);
 
-            var count = repo.Create(person);
-            Assert.AreEqual(1, count);
+            var manager = new Person
+            {
+                FirstName = "Dave",
+                LastName = "Smith",
+                Title = "Vice President"
+            };
+            Assert.AreEqual(1, repo.Create(manager));
 
-            var personFromDB = repo.FindById(person.Id);
-            Assert.IsNotNull(personFromDB);
+            Assert.IsNull(repo.FindManager(person.Id));
 
-            Assert.IsTrue(personFromDB.IsManaged);
-            Assert.AreEqual(manager.Id, personFromDB.ReportsTo.Id);
+            Assert.AreEqual(1, repo.PersistDirectReports(manager, person.Id));
+            Assert.AreEqual(manager, repo.FindManager(person.Id));
         }
 
         [TestMethod]
-        public void ShouldPermitExistingPersonToManage()
+        public void ShouldPersistManagerChange()
         {
             var repo = new PersonRepo();
-
-            var manager = new Person
-            {
-                FirstName = "Dave",
-                LastName = "Smith"
-            };
-
-            Assert.AreEqual(1, repo.Create(manager));
-
 
             var person = new Person
             {
                 FirstName = "John",
                 LastName = "Doe",
-                ReportsTo = manager
+                Title = "Clerk"
             };
-
             Assert.AreEqual(1, repo.Create(person));
 
-            var personFromDB = repo.FindById(person.Id);
-            Assert.IsNotNull(personFromDB);
-            Assert.IsTrue(personFromDB.IsManaged);
-            Assert.AreEqual(manager.Id, personFromDB.ReportsTo.Id);
+            var manager = new Person
+            {
+                FirstName = "Dave",
+                LastName = "Smith",
+                Title = "Vice President"
+            };
+            Assert.AreEqual(1, repo.Create(manager));
+
+            Assert.AreEqual(1, repo.PersistDirectReports(manager, person.Id));
+            Assert.AreEqual(manager, repo.FindManager(person.Id));
+
+            var newManager = new Person
+            {
+                FirstName = "Foo",
+                LastName = "Bar",
+                Title = "Chief Executive Officer"
+            };
+            Assert.AreEqual(1, repo.Create(newManager));
+
+            Assert.AreEqual(1, repo.PersistDirectReports(newManager, person.Id));
+            Assert.AreEqual(newManager, repo.FindManager(person.Id));
+
+            Assert.IsFalse(repo.FindDirectReports(manager.Id).Any());
+        }
+
+        [TestMethod]
+        public void ShouldNotPermitPersonToAssignThemselvesAsManager()
+        {
+            var repo = new PersonRepo();
+
+            var person = new Person
+            {
+                FirstName = "John",
+                LastName = "Doe",
+                Title = "Clerk"
+            };
+            Assert.AreEqual(1, repo.Create(person));
+
+            Assert.AreEqual(0, repo.PersistDirectReports(person, person.Id));
+            Assert.IsNull(repo.FindManager(person.Id));
         }
 
         [TestMethod]
@@ -102,32 +129,55 @@ namespace IntrepidProducts.RepoTests.Entities
         {
             var repo = new PersonRepo();
 
-            var manager = new Person
+            var manager = new Person(Guid.NewGuid())
             {
                 FirstName = "Dave",
-                LastName = "Smith"
+                LastName = "Smith",
+                Title = "Vice President"
             };
+            Assert.AreEqual(1, repo.Create(manager));
 
-            var directReport = new Person
+            var dr1 = new Person
             {
                 FirstName = "John",
                 LastName = "Doe",
+                Title = "Clerk"
+            };
+            repo.Create(dr1);
+
+            var dr2 = new Person
+            {
+                FirstName = "Foo",
+                LastName = "Bar",
+                Title = "Clerk"
+            };
+            repo.Create(dr2);
+
+            Assert.IsNull(repo.FindManager(dr1.Id));
+            Assert.IsNull(repo.FindManager(dr2.Id));
+
+            Assert.AreEqual(2, repo.PersistDirectReports(manager, dr1.Id, dr2.Id));
+            Assert.AreEqual(manager, repo.FindManager(dr1.Id));
+            Assert.AreEqual(manager, repo.FindManager(dr2.Id));
+        }
+        #endregion
+        #endregion
+
+        [TestMethod]
+        public void ShouldFindById()
+        {
+            var repo = new PersonRepo();
+
+            var person = new Person(Guid.NewGuid())
+            {
+                FirstName = "John",
+                LastName = "Doe"
             };
 
-            manager.AddDirectReport(directReport);
-
-            var count = repo.Create(manager);
+            var count = repo.Create(person);
             Assert.AreEqual(1, count);
 
-            var managerFromDB = repo.FindById(manager.Id);
-            Assert.IsNotNull(managerFromDB);
-            Assert.AreEqual(1, managerFromDB.DirectReportCount);
-            Assert.AreEqual(directReport.Id, managerFromDB.DirectReports.First().Id);
-
-            var directReportFromDB = repo.FindById(directReport.Id);
-            Assert.IsNotNull(directReportFromDB);
-            Assert.IsTrue(directReportFromDB.IsManaged);
-            Assert.AreEqual(directReportFromDB.ReportsTo, managerFromDB);
+            Assert.AreEqual(person, repo.FindById(person.Id));
         }
     }
 }
