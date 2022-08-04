@@ -73,12 +73,9 @@ namespace IntrepidProducts.OrgChart
 
             foreach (var drIds in directReportPersonIds)
             {
-                var isSuccessful = _repo.PersistDirectReport(manager, drIds);
+                var numberPersisted = _repo.PersistDirectReports(manager, drIds);
 
-                if (isSuccessful)
-                {
-                    count++;
-                }
+                count = count + numberPersisted;
             }
 
             return count;
@@ -93,11 +90,7 @@ namespace IntrepidProducts.OrgChart
                 return null;
             }
 
-            var managerRecord = _repo.FindManager(person.Id);
-
-            Person? manager = managerRecord == null
-                ? null
-                : _repo.FindById(managerRecord.ManagerPersonId);
+            var manager = _repo.FindManager(person.Id);
 
             var orgChart = new OrgChart(person)
             {

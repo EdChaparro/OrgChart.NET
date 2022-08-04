@@ -34,7 +34,9 @@ namespace IntrepidProducts.OrgChart.Tests
 
             var orgChart = service.GetOrgChartFor(manager.Id);
             Assert.IsNotNull(orgChart);
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
             Assert.AreEqual(manager, orgChart.ForPerson);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
             Assert.IsTrue(orgChart.IsManager);
             Assert.AreEqual(person, orgChart.DirectReports.First());

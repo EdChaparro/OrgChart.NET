@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using IntrepidProducts.Repo.Entities;
-using IntrepidProducts.Repo.Records;
 
 namespace IntrepidProducts.Repo
 {
     public interface IPersonRepo : IRepository<Person>
     {
         Person? FindById(Guid id);
-        ManagerRecord? FindManager(Guid directReportId);
+        Person? FindManager(Guid directReportId);
         IEnumerable<Person> FindDirectReports(Guid managerId);
-        bool PersistDirectReport(Person manager, Guid directReportId);
+        int PersistDirectReports(Person manager, params Guid[] directReportIds);
     }
 
     public class PersonRepo : RepoAbstract<Person, PersonContext>, IPersonRepo
@@ -20,9 +19,16 @@ namespace IntrepidProducts.Repo
             return DbContext.Find(new Person(id));
         }
 
-        public ManagerRecord? FindManager(Guid directReportId)
+        public Person? FindManager(Guid directReportId)
         {
-            return DbContext.FindManager(directReportId);
+            var managerRecord =  DbContext.FindManager(directReportId);
+
+            if (managerRecord == null)
+            {
+                return null;
+            }
+
+            return FindById(managerRecord.ManagerPersonId);
         }
 
         public IEnumerable<Person> FindDirectReports(Guid managerId)
@@ -30,7 +36,24 @@ namespace IntrepidProducts.Repo
             return DbContext.FindDirectReports(managerId);
         }
 
-        public bool PersistDirectReport(Person manager, Guid directReportId)
+        public int PersistDirectReports(Person manager, params Guid[] directReportIds)
+        {
+            var count = 0;
+
+            foreach (var id in directReportIds)
+            {
+                var isSuccessful = PersistDirectReport(manager, id);
+
+                if (isSuccessful)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        private bool PersistDirectReport(Person manager, Guid directReportId)
         {
             return DbContext.PersistDirectReport(manager, directReportId);
         }
