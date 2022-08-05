@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using IntrepidProducts.Repo.Entities;
 
 namespace IntrepidProducts.Repo
@@ -36,12 +37,45 @@ namespace IntrepidProducts.Repo
             return DbContext.FindDirectReports(managerId);
         }
 
+        private IEnumerable<Person> FindChainOfCommand(Guid directReportId)
+        {
+            var chainOfCommand = new List<Person>();
+
+            var nextPersonId = directReportId;
+
+            while (true)
+            {
+                var manager = FindManager(nextPersonId);
+                if (manager == null)
+                {
+                    break;
+                }
+
+                chainOfCommand.Add(manager);
+                nextPersonId = manager.Id;
+            }
+
+            return chainOfCommand;
+        }
+
+        private bool IsDirectReportEligible(Guid managerId, Guid directReportId)
+        {
+            var chainOfCommand = FindChainOfCommand(managerId);
+
+            return chainOfCommand.All(x => x.Id != directReportId);
+        }
+
         public int PersistDirectReports(Person manager, params Guid[] directReportIds)
         {
             var count = 0;
 
             foreach (var id in directReportIds)
             {
+                if (!IsDirectReportEligible(manager.Id, id))
+                {
+                    continue;
+                }
+
                 var isSuccessful = PersistDirectReport(manager, id);
 
                 if (isSuccessful)

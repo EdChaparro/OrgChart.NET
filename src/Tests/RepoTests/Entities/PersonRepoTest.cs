@@ -160,6 +160,60 @@ namespace IntrepidProducts.RepoTests.Entities
             Assert.AreEqual(manager, repo.FindManager(dr1.Id));
             Assert.AreEqual(manager, repo.FindManager(dr2.Id));
         }
+
+        [TestMethod]
+        public void ShouldNotPersistChainOfCommandMembersAsDirectReports()
+        {
+            var repo = new PersonRepo();
+
+            var manager = new Person(Guid.NewGuid())
+            {
+                FirstName = "Dave",
+                LastName = "Smith",
+                Title = "Assistant Manager"
+            };
+            Assert.AreEqual(1, repo.Create(manager));
+
+            var director = new Person
+            {
+                FirstName = "John",
+                LastName = "Doe",
+                Title = "Director"
+            };
+            repo.Create(director);
+
+            var svp = new Person
+            {
+                FirstName = "Foo",
+                LastName = "Bar",
+                Title = "Senior Vice President"
+            };
+            repo.Create(svp);
+
+            var dr1 = new Person
+            {
+                FirstName = "Bruno",
+                LastName = "Brazer",
+                Title = "Clerk"
+            };
+            repo.Create(dr1);
+
+            var dr2 = new Person
+            {
+                FirstName = "Sally",
+                LastName = "Mae",
+                Title = "Clerk"
+            };
+            repo.Create(dr2);
+
+            Assert.AreEqual(2, repo.PersistDirectReports(manager, dr1.Id, dr2.Id));
+            Assert.AreEqual(1, repo.PersistDirectReports(director, manager.Id));
+            Assert.AreEqual(1, repo.PersistDirectReports(svp, director.Id));
+
+            Assert.AreEqual(0, repo.PersistDirectReports(dr2, director.Id));
+            Assert.AreEqual(0, repo.PersistDirectReports(dr1, manager.Id));
+            Assert.AreEqual(0, repo.PersistDirectReports(dr1, svp.Id));
+        }
         #endregion
         #endregion
 
