@@ -13,7 +13,7 @@ namespace IntrepidProducts.OrgChart
 
         public Person ForPerson { get; }
 
-        public int NumberOfLevels { get; set; }
+        public int NumberOfLevels => GetDirectReportDepth(this);
 
         public Person? ReportsTo { get; set; }
 
@@ -24,11 +24,29 @@ namespace IntrepidProducts.OrgChart
 
         public int DirectReportCount => DirectReports.Count();
 
-        public bool AddDirectReport(params OrgChart[] orgChart)
+        private static int GetDirectReportDepth(OrgChart orgChart)
         {
-            foreach (var person in orgChart)
+            var depth = 1;
+            var drDepth = 0;
+
+            foreach (var directReport in orgChart.DirectReports.ToList())
             {
-                if (!AddDirectReport(person))
+                var nodeDepth = GetDirectReportDepth(directReport);
+
+                if (nodeDepth > drDepth)
+                {
+                    drDepth = nodeDepth;
+                }
+            }
+
+            return depth + drDepth;
+        }
+
+        public bool AddDirectReport(params OrgChart[] orgCharts)
+        {
+            foreach (var orgChart in orgCharts)
+            {
+                if (!AddDirectReport(orgChart))
                 {
                     return false;
                 }

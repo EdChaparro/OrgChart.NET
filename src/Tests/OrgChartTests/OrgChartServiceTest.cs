@@ -230,5 +230,104 @@ namespace IntrepidProducts.OrgChart.Tests
 
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
         }
+
+        [TestMethod]
+        public void ShouldRespectRequestedDepthLevel()
+        {
+            IOrgChartService service = new OrgChartService(new PersonRepo());
+
+            var ceo = new Person
+            {
+                FirstName = "Tyler",
+                LastName = "James",
+                Title = "Chief Executive Officer"
+            };
+
+            var svp = new Person
+            {
+                FirstName = "Jesse",
+                LastName = "Owens",
+                Title = "Senior Vice President"
+            };
+
+            var director = new Person
+            {
+                FirstName = "Clark",
+                LastName = "Kent",
+                Title = "Director"
+            };
+
+            var manager1 = new Person
+            {
+                FirstName = "Dave",
+                LastName = "Smith",
+                Title = "Manager"
+            };
+
+            var manager2 = new Person
+            {
+                FirstName = "Frank",
+                LastName = "Stallone",
+                Title = "Senior Manager"
+            };
+
+            var dr1 = new Person
+            {
+                FirstName = "John",
+                LastName = "Doe",
+                Title = "Clerk"
+            };
+
+            var dr2 = new Person
+            {
+                FirstName = "Foo",
+                LastName = "Bar",
+                Title = "Inventory Clerk"
+            };
+
+            var dr3 = new Person
+            {
+                FirstName = "Bat",
+                LastName = "Man",
+                Title = "Operations Lead"
+            };
+
+            var count = service.Add(ceo, svp, director, manager1, manager2, dr1, dr2, dr3);
+            Assert.AreEqual(8, count);
+
+            Assert.AreEqual(1, service.AddDirectReports(ceo.Id, svp.Id));
+            Assert.AreEqual(1, service.AddDirectReports(svp.Id, director.Id));
+            Assert.AreEqual(2, service.AddDirectReports(director.Id, manager1.Id, manager2.Id));
+            Assert.AreEqual(2, service.AddDirectReports(manager1.Id, dr1.Id, dr2.Id));
+            Assert.AreEqual(1, service.AddDirectReports(manager2.Id, dr3.Id));
+
+            //One Level
+            var orgChart = service.GetOrgChartFor(ceo.Id, 1);
+            Assert.IsNotNull(orgChart);
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            Assert.AreEqual(ceo, orgChart.ForPerson);
+            Assert.AreEqual(1, orgChart.NumberOfLevels);
+            Assert.IsFalse(orgChart.IsManager); //False because only one level was built
+
+            //Two Levels
+            orgChart = service.GetOrgChartFor(ceo.Id, 2);
+            Assert.IsNotNull(orgChart);
+            Assert.AreEqual(ceo, orgChart.ForPerson);
+            Assert.AreEqual(2, orgChart.NumberOfLevels);
+            Assert.IsTrue(orgChart.IsManager);
+            Assert.AreEqual(svp, orgChart.DirectReports.FirstOrDefault()?.ForPerson);
+            Assert.IsFalse(orgChart.DirectReports.First().IsManager); //False because deeper level truncated
+
+            //All Levels
+            orgChart = service.GetOrgChartFor(ceo.Id, 99);  //99 is arbitrary, more than we need
+            Assert.IsNotNull(orgChart);
+            Assert.AreEqual(ceo, orgChart.ForPerson);
+            Assert.AreEqual(5, orgChart.NumberOfLevels);
+            Assert.IsTrue(orgChart.IsManager);
+            Assert.AreEqual(svp, orgChart.DirectReports.FirstOrDefault()?.ForPerson);
+            Assert.IsTrue(orgChart.DirectReports.First().IsManager);
+
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+        }
     }
 }
