@@ -21,9 +21,7 @@ namespace IntrepidProducts.RepoTests.Entities
                 LastName = "Doe"
             };
 
-            var count = repo.Create(person);
-
-            Assert.AreEqual(1, count);
+            Assert.IsTrue(repo.Create(person));
         }
 
         [TestMethod]
@@ -36,9 +34,7 @@ namespace IntrepidProducts.RepoTests.Entities
                 FirstName = "John", //No Last Name
             };
 
-            var count = repo.Create(person);
-
-            Assert.AreEqual(0, count);  //Nothing created
+            Assert.IsFalse(repo.Create(person));    //Nothing created
         }
 
         #region Manager
@@ -61,7 +57,7 @@ namespace IntrepidProducts.RepoTests.Entities
                 LastName = "Smith",
                 Title = "Vice President"
             };
-            Assert.AreEqual(1, repo.Create(manager));
+            Assert.IsTrue(repo.Create(manager));
 
             Assert.IsNull(repo.FindManager(person.Id));
 
@@ -80,7 +76,7 @@ namespace IntrepidProducts.RepoTests.Entities
                 LastName = "Doe",
                 Title = "Clerk"
             };
-            Assert.AreEqual(1, repo.Create(person));
+            Assert.IsTrue(repo.Create(person));
 
             var manager = new Person
             {
@@ -88,7 +84,7 @@ namespace IntrepidProducts.RepoTests.Entities
                 LastName = "Smith",
                 Title = "Vice President"
             };
-            Assert.AreEqual(1, repo.Create(manager));
+            Assert.IsTrue(repo.Create(manager));
 
             Assert.AreEqual(1, repo.PersistDirectReports(manager, person.Id));
             Assert.AreEqual(manager, repo.FindManager(person.Id));
@@ -99,7 +95,7 @@ namespace IntrepidProducts.RepoTests.Entities
                 LastName = "Bar",
                 Title = "Chief Executive Officer"
             };
-            Assert.AreEqual(1, repo.Create(newManager));
+            Assert.IsTrue(repo.Create(newManager));
 
             Assert.AreEqual(1, repo.PersistDirectReports(newManager, person.Id));
             Assert.AreEqual(newManager, repo.FindManager(person.Id));
@@ -118,7 +114,7 @@ namespace IntrepidProducts.RepoTests.Entities
                 LastName = "Doe",
                 Title = "Clerk"
             };
-            Assert.AreEqual(1, repo.Create(person));
+            Assert.IsTrue(repo.Create(person));
 
             Assert.AreEqual(0, repo.PersistDirectReports(person, person.Id));
             Assert.IsNull(repo.FindManager(person.Id));
@@ -135,7 +131,7 @@ namespace IntrepidProducts.RepoTests.Entities
                 LastName = "Smith",
                 Title = "Vice President"
             };
-            Assert.AreEqual(1, repo.Create(manager));
+            Assert.IsTrue(repo.Create(manager));
 
             var dr1 = new Person
             {
@@ -172,7 +168,7 @@ namespace IntrepidProducts.RepoTests.Entities
                 LastName = "Smith",
                 Title = "Assistant Manager"
             };
-            Assert.AreEqual(1, repo.Create(manager));
+            Assert.IsTrue(repo.Create(manager));
 
             var director = new Person
             {
@@ -228,9 +224,7 @@ namespace IntrepidProducts.RepoTests.Entities
                 LastName = "Doe"
             };
 
-            var count = repo.Create(person);
-            Assert.AreEqual(1, count);
-
+            Assert.IsTrue(repo.Create(person));
             Assert.AreEqual(person, repo.FindById(person.Id));
         }
     }

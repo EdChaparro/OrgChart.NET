@@ -2,9 +2,9 @@
 {
     public interface IRepository<TEntity> where TEntity : class, IEntity
     {
-        int Create(TEntity entity);
-        int Update(TEntity entity);
-        int Delete(TEntity entity);
+        bool Create(TEntity entity);
+        bool Update(TEntity entity);
+        bool Delete(TEntity entity);
     }
 
     public abstract class RepoAbstract<TEntity, TDbContext> : IRepository<TEntity>
@@ -18,19 +18,19 @@
 
         internal TDbContext DbContext { get; }
 
-        public virtual int Create(TEntity entity)
+        public virtual bool Create(TEntity entity)
         {
-            return DbContext.Create(entity);
+            return DbContext.Create(entity) > 0;
         }
 
-        public virtual int Update(TEntity entity)
+        public virtual bool Update(TEntity entity)
         {
-            return DbContext.Update(entity);
+            return DbContext.Update(entity) > 0;
         }
 
-        public virtual int Delete(TEntity entity)
+        public virtual bool Delete(TEntity entity)
         {
-            return DbContext.Delete(entity);
+            return DbContext.Delete(entity) > 0;
         }
     }
 }

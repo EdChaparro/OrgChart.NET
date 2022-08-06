@@ -37,21 +37,22 @@ namespace IntrepidProducts.OrgChart
             var count = 0;
             foreach (var person in persons)
             {
-                count = count + _repo.Create(person);
+                if (_repo.Create(person))
+                {
+                    count++;
+                }
             }
 
             return count;
         }
         public bool Update(Person person)
         {
-            var result = _repo.Update(person);
-            return result > 0;
+            return _repo.Update(person);
         }
 
         public bool Delete(Person person)
         {
-            var result = _repo.Delete(person);
-            return result > 0;
+            return _repo.Delete(person);
         }
 
         public bool RemoveManager(Person person, Guid managerId)
