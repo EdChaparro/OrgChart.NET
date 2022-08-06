@@ -58,11 +58,30 @@ namespace IntrepidProducts.Repo
             return chainOfCommand;
         }
 
+        private bool IsDirectReportRelationshipValid(Guid managerId, Guid directReportId)
+        {
+            return IsRelationshipReferenceValid(managerId, directReportId) &&
+                   IsDirectReportEligible(managerId, directReportId);
+        }
+
         private bool IsDirectReportEligible(Guid managerId, Guid directReportId)
         {
             var chainOfCommand = FindChainOfCommand(managerId);
 
             return chainOfCommand.All(x => x.Id != directReportId);
+        }
+
+        private bool IsRelationshipReferenceValid(Guid managerId, Guid directReportId)
+        {
+            if (managerId == directReportId)
+            {
+                return false;
+            }
+
+            var persistedManager = FindById(managerId);
+            var directReport = FindById(directReportId);
+
+            return persistedManager != null && directReport != null;
         }
 
         public int PersistDirectReports(Person manager, params Guid[] directReportIds)
@@ -71,7 +90,7 @@ namespace IntrepidProducts.Repo
 
             foreach (var id in directReportIds)
             {
-                if (!IsDirectReportEligible(manager.Id, id))
+                if (!IsDirectReportRelationshipValid(manager.Id, id))
                 {
                     continue;
                 }

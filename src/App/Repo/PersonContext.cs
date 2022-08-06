@@ -49,26 +49,8 @@ namespace IntrepidProducts.Repo
             return FindById(entity.Id);
         }
 
-        private bool IsRelationshipValid(Person manager, Guid directReportId)
-        {
-            if (manager.Id == directReportId)
-            {
-                return false;
-            }
-
-            var persistedManager = FindById(manager.Id);
-            var directReport = FindById(directReportId);
-
-            return persistedManager != null && directReport != null;
-        }
-
         public bool PersistDirectReport(Person manager, Guid directReportId)
         {
-            if (!IsRelationshipValid(manager, directReportId))
-            {
-                return false;
-            }
-
             var presentManagerRecord = FindManager(directReportId);
             if (presentManagerRecord != null)
             {
