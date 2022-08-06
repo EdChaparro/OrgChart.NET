@@ -62,7 +62,15 @@ namespace IntrepidProducts.Repo
                 return 0;
             }
 
-            DbSet.Remove(Convert(entity));
+            var isDetached = DbContextExtensions.DetachLocal
+                (this, Convert(entity), EntityState.Deleted);
+
+            if (!isDetached)
+            {
+                return 0;
+            }
+
+            //DbSet.Remove(Convert(entity));    //Not needed, already flagged for deletion
             return SaveChanges();
         }
 

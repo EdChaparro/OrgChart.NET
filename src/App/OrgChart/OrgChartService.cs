@@ -50,7 +50,8 @@ namespace IntrepidProducts.OrgChart
 
         public bool Delete(Person person)
         {
-            throw new NotImplementedException();
+            var result = _repo.Delete(person);
+            return result > 0;
         }
 
         public bool RemoveManager(Person person, Guid managerId)

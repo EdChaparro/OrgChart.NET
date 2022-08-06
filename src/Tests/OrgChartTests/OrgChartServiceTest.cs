@@ -79,5 +79,30 @@ namespace IntrepidProducts.OrgChart.Tests
             Assert.AreEqual(MODIFIED_TITLE, person.Title);
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
         }
+
+        [TestMethod]
+        public void ShouldDeletePerson()
+        {
+            IOrgChartService service = new OrgChartService(new PersonRepo());
+
+            var person = new Person
+            {
+                FirstName = "John",
+                LastName = "Doe",
+                Title = "Analyst"
+            };
+
+            var addCount = service.Add(person);
+            Assert.AreEqual(1, addCount);
+
+            person = service.FindById(person.Id);
+            Assert.IsNotNull(person);
+
+            var isDeleted = service.Delete(person);
+            Assert.IsTrue(isDeleted);
+
+            person = service.FindById(person.Id);
+            Assert.IsNull(person);
+        }
     }
 }

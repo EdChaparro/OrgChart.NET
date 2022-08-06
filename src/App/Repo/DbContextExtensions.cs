@@ -19,7 +19,7 @@ namespace IntrepidProducts.Repo
             }
 
             dbContext.Entry(local).State = EntityState.Detached;
-            dbContext.Entry(record).State = EntityState.Modified;
+            dbContext.Entry(record).State = state;
             return true;
         }
     }
