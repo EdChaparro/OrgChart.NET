@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using IntrepidProducts.Repo;
 using IntrepidProducts.Repo.Entities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -30,7 +31,7 @@ namespace IntrepidProducts.OrgChart.Tests
             var count = service.Add(manager, person);
             Assert.AreEqual(2, count);
 
-            service.AddDirectReports(manager, person.Id);
+            service.AddDirectReports(manager.Id, person.Id);
 
             var orgChart = service.GetOrgChartFor(manager.Id);
             Assert.IsNotNull(orgChart);
@@ -126,7 +127,7 @@ namespace IntrepidProducts.OrgChart.Tests
             };
             Assert.AreEqual(1, service.Add(person));
 
-            Assert.AreEqual(1, service.AddDirectReports(manager, person.Id));
+            Assert.AreEqual(1, service.AddDirectReports(manager.Id, person.Id));
 
             var isDeleted = service.Delete(manager);
             Assert.IsFalse(isDeleted);
@@ -154,7 +155,7 @@ namespace IntrepidProducts.OrgChart.Tests
             var count = service.Add(manager, person);
             Assert.AreEqual(2, count);
 
-            service.AddDirectReports(manager, person.Id);
+            service.AddDirectReports(manager.Id, person.Id);
 
             var orgChart = service.GetOrgChartFor(person.Id);
             Assert.IsNotNull(orgChart);
@@ -166,6 +167,65 @@ namespace IntrepidProducts.OrgChart.Tests
             orgChart = service.GetOrgChartFor(person.Id);
             Assert.IsNotNull(orgChart);
             Assert.IsNull(orgChart.ReportsTo);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+        }
+
+        [TestMethod]
+        public void ShouldReplaceManager()
+        {
+            IOrgChartService service = new OrgChartService(new PersonRepo());
+
+            var presentManager = new Person
+            {
+                FirstName = "Dave",
+                LastName = "Smith",
+                Title = "Manager"
+            };
+
+            var newManager = new Person
+            {
+                FirstName = "Foo",
+                LastName = "Bar",
+                Title = "Manager"
+            };
+
+            var dr1 = new Person
+            {
+                FirstName = "John",
+                LastName = "Doe",
+                Title = "Clerk"
+            };
+
+            var dr2 = new Person
+            {
+                FirstName = "Timothy",
+                LastName = "Dalton",
+                Title = "Clerk"
+            };
+
+            var count = service.Add(presentManager, newManager, dr1, dr2);
+            Assert.AreEqual(4, count);
+
+            service.AddDirectReports(presentManager.Id, dr1.Id, dr2.Id);
+
+            var orgChart = service.GetOrgChartFor(presentManager.Id);
+            Assert.IsNotNull(orgChart);
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            CollectionAssert.AreEqual
+                (new List<Person> {dr1, dr2}, orgChart.DirectReports.ToList());
+
+            Assert.IsTrue(service.ReplaceManager(presentManager.Id, newManager.Id));
+
+            orgChart = service.GetOrgChartFor(presentManager.Id);
+            Assert.IsNotNull(orgChart);
+            Assert.IsFalse(orgChart.IsManager);
+
+            orgChart = service.GetOrgChartFor(newManager.Id);
+            Assert.IsNotNull(orgChart);
+            Assert.IsTrue(orgChart.IsManager);
+            CollectionAssert.AreEqual
+                (new List<Person> { dr1, dr2 }, orgChart.DirectReports.ToList());
+
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
         }
     }

@@ -61,7 +61,7 @@ namespace IntrepidProducts.RepoTests.Entities
 
             Assert.IsNull(repo.FindManager(person.Id));
 
-            Assert.AreEqual(1, repo.PersistDirectReports(manager, person.Id));
+            Assert.AreEqual(1, repo.PersistDirectReports(manager.Id, person.Id));
             Assert.AreEqual(manager, repo.FindManager(person.Id));
         }
 
@@ -86,7 +86,7 @@ namespace IntrepidProducts.RepoTests.Entities
             };
             Assert.IsTrue(repo.Create(manager));
 
-            Assert.AreEqual(1, repo.PersistDirectReports(manager, person.Id));
+            Assert.AreEqual(1, repo.PersistDirectReports(manager.Id, person.Id));
             Assert.AreEqual(manager, repo.FindManager(person.Id));
 
             var newManager = new Person
@@ -97,7 +97,7 @@ namespace IntrepidProducts.RepoTests.Entities
             };
             Assert.IsTrue(repo.Create(newManager));
 
-            Assert.AreEqual(1, repo.PersistDirectReports(newManager, person.Id));
+            Assert.AreEqual(1, repo.PersistDirectReports(newManager.Id, person.Id));
             Assert.AreEqual(newManager, repo.FindManager(person.Id));
 
             Assert.IsFalse(repo.FindDirectReports(manager.Id).Any());
@@ -116,7 +116,7 @@ namespace IntrepidProducts.RepoTests.Entities
             };
             Assert.IsTrue(repo.Create(person));
 
-            Assert.AreEqual(0, repo.PersistDirectReports(person, person.Id));
+            Assert.AreEqual(0, repo.PersistDirectReports(person.Id, person.Id));
             Assert.IsNull(repo.FindManager(person.Id));
         }
 
@@ -152,7 +152,7 @@ namespace IntrepidProducts.RepoTests.Entities
             Assert.IsNull(repo.FindManager(dr1.Id));
             Assert.IsNull(repo.FindManager(dr2.Id));
 
-            Assert.AreEqual(2, repo.PersistDirectReports(manager, dr1.Id, dr2.Id));
+            Assert.AreEqual(2, repo.PersistDirectReports(manager.Id, dr1.Id, dr2.Id));
             Assert.AreEqual(manager, repo.FindManager(dr1.Id));
             Assert.AreEqual(manager, repo.FindManager(dr2.Id));
         }
@@ -202,13 +202,13 @@ namespace IntrepidProducts.RepoTests.Entities
             };
             repo.Create(dr2);
 
-            Assert.AreEqual(2, repo.PersistDirectReports(manager, dr1.Id, dr2.Id));
-            Assert.AreEqual(1, repo.PersistDirectReports(director, manager.Id));
-            Assert.AreEqual(1, repo.PersistDirectReports(svp, director.Id));
+            Assert.AreEqual(2, repo.PersistDirectReports(manager.Id, dr1.Id, dr2.Id));
+            Assert.AreEqual(1, repo.PersistDirectReports(director.Id, manager.Id));
+            Assert.AreEqual(1, repo.PersistDirectReports(svp.Id, director.Id));
 
-            Assert.AreEqual(0, repo.PersistDirectReports(dr2, director.Id));
-            Assert.AreEqual(0, repo.PersistDirectReports(dr1, manager.Id));
-            Assert.AreEqual(0, repo.PersistDirectReports(dr1, svp.Id));
+            Assert.AreEqual(0, repo.PersistDirectReports(dr2.Id, director.Id));
+            Assert.AreEqual(0, repo.PersistDirectReports(dr1.Id, manager.Id));
+            Assert.AreEqual(0, repo.PersistDirectReports(dr1.Id, svp.Id));
         }
         #endregion
         #endregion

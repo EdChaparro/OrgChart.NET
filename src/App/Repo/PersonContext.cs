@@ -9,7 +9,7 @@ namespace IntrepidProducts.Repo
 {
     public interface IPersonContext : IDbContext<Person>
     {
-        bool PersistDirectReport(Person manager, Guid directReportId);
+        bool PersistDirectReport(Guid managerId, Guid directReportId);
         ManagerRecord? FindManager(Guid directReportId);
         bool RemoveManager(Guid directReportId);
         IEnumerable<Person> FindDirectReports(Guid managerId);
@@ -50,12 +50,12 @@ namespace IntrepidProducts.Repo
             return FindById(entity.Id);
         }
 
-        public bool PersistDirectReport(Person manager, Guid directReportId)
+        public bool PersistDirectReport(Guid managerId, Guid directReportId)
         {
             var presentManagerRecord = FindManager(directReportId);
             if (presentManagerRecord != null)
             {
-                if (presentManagerRecord.ManagerPersonId == manager.Id)
+                if (presentManagerRecord.ManagerPersonId == managerId)
                 {
                     return true;
                 }
@@ -64,7 +64,7 @@ namespace IntrepidProducts.Repo
             }
 
             var newManagerRecord = new ManagerRecord
-                { DirectReportPersonId = directReportId, ManagerPersonId = manager.Id };
+                { DirectReportPersonId = directReportId, ManagerPersonId = managerId };
 
             ManagerDbSet.Add(newManagerRecord);
             var result = SaveChanges();

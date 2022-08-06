@@ -10,7 +10,7 @@ namespace IntrepidProducts.Repo
         Person? FindById(Guid id);
         Person? FindManager(Guid directReportId);
         IEnumerable<Person> FindDirectReports(Guid managerId);
-        int PersistDirectReports(Person manager, params Guid[] directReportIds);
+        int PersistDirectReports(Guid managerId, params Guid[] directReportIds);
 
         bool RemoveManager(Guid directReportId);
     }
@@ -96,18 +96,18 @@ namespace IntrepidProducts.Repo
             return persistedManager != null && directReport != null;
         }
 
-        public int PersistDirectReports(Person manager, params Guid[] directReportIds)
+        public int PersistDirectReports(Guid managerId, params Guid[] directReportIds)
         {
             var count = 0;
 
-            foreach (var id in directReportIds)
+            foreach (var directReportId in directReportIds)
             {
-                if (!IsDirectReportRelationshipValid(manager.Id, id))
+                if (!IsDirectReportRelationshipValid(managerId, directReportId))
                 {
                     continue;
                 }
 
-                var isSuccessful = PersistDirectReport(manager, id);
+                var isSuccessful = PersistDirectReport(managerId, directReportId);
 
                 if (isSuccessful)
                 {
@@ -118,9 +118,9 @@ namespace IntrepidProducts.Repo
             return count;
         }
 
-        private bool PersistDirectReport(Person manager, Guid directReportId)
+        private bool PersistDirectReport(Guid managerId, Guid directReportId)
         {
-            return DbContext.PersistDirectReport(manager, directReportId);
+            return DbContext.PersistDirectReport(managerId, directReportId);
         }
 
         public bool RemoveManager(Guid directReportId)
