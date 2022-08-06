@@ -28,7 +28,7 @@
             return DbContext.Update(entity);
         }
 
-        public int Delete(TEntity entity)
+        public virtual int Delete(TEntity entity)
         {
             return DbContext.Delete(entity);
         }

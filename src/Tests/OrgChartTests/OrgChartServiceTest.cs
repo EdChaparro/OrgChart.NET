@@ -104,5 +104,32 @@ namespace IntrepidProducts.OrgChart.Tests
             person = service.FindById(person.Id);
             Assert.IsNull(person);
         }
+
+        [TestMethod]
+        public void ShouldNotDeletePersonsWithDirectReports()
+        {
+            IOrgChartService service = new OrgChartService(new PersonRepo());
+
+            var manager = new Person
+            {
+                FirstName = "Foo",
+                LastName = "Bar",
+                Title = "Manager"
+            };
+            Assert.AreEqual(1, service.Add(manager));
+
+            var person = new Person
+            {
+                FirstName = "John",
+                LastName = "Doe",
+                Title = "Analyst"
+            };
+            Assert.AreEqual(1, service.Add(person));
+
+            Assert.AreEqual(1, service.AddDirectReports(manager, person.Id));
+
+            var isDeleted = service.Delete(manager);
+            Assert.IsFalse(isDeleted);
+        }
     }
 }

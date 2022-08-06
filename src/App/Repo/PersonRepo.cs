@@ -37,6 +37,16 @@ namespace IntrepidProducts.Repo
             return DbContext.FindDirectReports(managerId);
         }
 
+        public override int Delete(Person person)
+        {
+            if (FindDirectReports(person.Id).Any())
+            {
+                return 0;   //Direct reports must be reassigned before deletion
+            }
+
+            return base.Delete(person);
+        }
+
         private IEnumerable<Person> FindChainOfCommand(Guid directReportId)
         {
             var chainOfCommand = new List<Person>();
