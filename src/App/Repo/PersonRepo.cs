@@ -11,6 +11,8 @@ namespace IntrepidProducts.Repo
         Person? FindManager(Guid directReportId);
         IEnumerable<Person> FindDirectReports(Guid managerId);
         int PersistDirectReports(Person manager, params Guid[] directReportIds);
+
+        bool RemoveManager(Guid directReportId);
     }
 
     public class PersonRepo : RepoAbstract<Person, PersonContext>, IPersonRepo
@@ -119,6 +121,17 @@ namespace IntrepidProducts.Repo
         private bool PersistDirectReport(Person manager, Guid directReportId)
         {
             return DbContext.PersistDirectReport(manager, directReportId);
+        }
+
+        public bool RemoveManager(Guid directReportId)
+        {
+            var managerRecord = DbContext.FindManager(directReportId);
+            if (managerRecord == null)
+            {
+                return false;
+            }
+
+            return DbContext.RemoveManager(directReportId);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace IntrepidProducts.OrgChart
         bool Update(Person person);
         bool Delete(Person person);
 
-        bool RemoveManager(Person person, Guid managerId);
+        bool RemoveManager(Person person);
         int ReplaceManager(Guid oldManagerId, Guid newManagerId);
 
         int AddDirectReports(Person manager, params Person[] directReportPersons);
@@ -55,9 +55,9 @@ namespace IntrepidProducts.OrgChart
             return _repo.Delete(person);
         }
 
-        public bool RemoveManager(Person person, Guid managerId)
+        public bool RemoveManager(Person directReport)
         {
-            throw new NotImplementedException();
+            return _repo.RemoveManager(directReport.Id);
         }
 
         public int ReplaceManager(Guid oldManagerId, Guid newManagerId)

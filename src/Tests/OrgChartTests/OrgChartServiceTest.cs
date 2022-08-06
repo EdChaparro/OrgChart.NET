@@ -131,5 +131,42 @@ namespace IntrepidProducts.OrgChart.Tests
             var isDeleted = service.Delete(manager);
             Assert.IsFalse(isDeleted);
         }
+
+        [TestMethod]
+        public void ShouldRemoveManager()
+        {
+            IOrgChartService service = new OrgChartService(new PersonRepo());
+
+            var manager = new Person
+            {
+                FirstName = "Dave",
+                LastName = "Smith",
+                Title = "Manager"
+            };
+
+            var person = new Person
+            {
+                FirstName = "John",
+                LastName = "Doe",
+                Title = "Clerk"
+            };
+
+            var count = service.Add(manager, person);
+            Assert.AreEqual(2, count);
+
+            service.AddDirectReports(manager, person.Id);
+
+            var orgChart = service.GetOrgChartFor(person.Id);
+            Assert.IsNotNull(orgChart);
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            Assert.AreEqual(manager, orgChart.ReportsTo);
+
+            Assert.IsTrue(service.RemoveManager(person));
+
+            orgChart = service.GetOrgChartFor(person.Id);
+            Assert.IsNotNull(orgChart);
+            Assert.IsNull(orgChart.ReportsTo);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+        }
     }
 }

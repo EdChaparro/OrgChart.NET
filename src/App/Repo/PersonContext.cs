@@ -11,6 +11,7 @@ namespace IntrepidProducts.Repo
     {
         bool PersistDirectReport(Person manager, Guid directReportId);
         ManagerRecord? FindManager(Guid directReportId);
+        bool RemoveManager(Guid directReportId);
         IEnumerable<Person> FindDirectReports(Guid managerId);
     }
 
@@ -92,6 +93,25 @@ namespace IntrepidProducts.Repo
         private ManagerRecord? FindManager(Person person)
         {
             return FindManager(person.Id);
+        }
+
+        public bool RemoveManager(Guid directReportId)
+        {
+            var managerRecord = FindManager(directReportId);
+            if (managerRecord == null)
+            {
+                return false;
+            }
+
+            var isDetached = DbContextExtensions.DetachLocal
+                (this, managerRecord, EntityState.Deleted);
+
+            if (!isDetached)
+            {
+                return false;
+            }
+
+            return SaveChanges() > 0;
         }
 
         public IEnumerable<Person> FindDirectReports(Guid  managerId)
