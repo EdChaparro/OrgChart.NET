@@ -9,8 +9,9 @@ namespace IntrepidProducts.Repo
 {
     public interface IPersonContext : IDbContext<Person>
     {
-        bool PersistDirectReport(Person manager, Guid directReportId);
+        bool PersistDirectReport(Guid managerId, Guid directReportId);
         ManagerRecord? FindManager(Guid directReportId);
+        bool RemoveManager(Guid directReportId);
         IEnumerable<Person> FindDirectReports(Guid managerId);
     }
 
@@ -49,30 +50,12 @@ namespace IntrepidProducts.Repo
             return FindById(entity.Id);
         }
 
-        private bool IsRelationshipValid(Person manager, Guid directReportId)
+        public bool PersistDirectReport(Guid managerId, Guid directReportId)
         {
-            if (manager.Id == directReportId)
-            {
-                return false;
-            }
-
-            var persistedManager = FindById(manager.Id);
-            var directReport = FindById(directReportId);
-
-            return persistedManager != null && directReport != null;
-        }
-
-        public bool PersistDirectReport(Person manager, Guid directReportId)
-        {
-            if (!IsRelationshipValid(manager, directReportId))
-            {
-                return false;
-            }
-
             var presentManagerRecord = FindManager(directReportId);
             if (presentManagerRecord != null)
             {
-                if (presentManagerRecord.ManagerPersonId == manager.Id)
+                if (presentManagerRecord.ManagerPersonId == managerId)
                 {
                     return true;
                 }
@@ -81,7 +64,7 @@ namespace IntrepidProducts.Repo
             }
 
             var newManagerRecord = new ManagerRecord
-                { DirectReportPersonId = directReportId, ManagerPersonId = manager.Id };
+                { DirectReportPersonId = directReportId, ManagerPersonId = managerId };
 
             ManagerDbSet.Add(newManagerRecord);
             var result = SaveChanges();
@@ -110,6 +93,25 @@ namespace IntrepidProducts.Repo
         private ManagerRecord? FindManager(Person person)
         {
             return FindManager(person.Id);
+        }
+
+        public bool RemoveManager(Guid directReportId)
+        {
+            var managerRecord = FindManager(directReportId);
+            if (managerRecord == null)
+            {
+                return false;
+            }
+
+            var isDetached = DbContextExtensions.DetachLocal
+                (this, managerRecord, EntityState.Deleted);
+
+            if (!isDetached)
+            {
+                return false;
+            }
+
+            return SaveChanges() > 0;
         }
 
         public IEnumerable<Person> FindDirectReports(Guid  managerId)

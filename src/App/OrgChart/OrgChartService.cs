@@ -11,12 +11,10 @@ namespace IntrepidProducts.OrgChart
         bool Update(Person person);
         bool Delete(Person person);
 
-        bool RemoveManager(Person person, Guid managerId);
-        int ReplaceManager(Guid oldManagerId, Guid newManagerId);
+        bool RemoveManager(Person person);
+        bool ReplaceManager(Guid oldManagerId, Guid newManagerId);
 
-        int AddDirectReports(Person manager, params Person[] directReportPersons);
-
-        int AddDirectReports(Person manager, params Guid[] directReportPersonIds);
+        int AddDirectReports(Guid managerId, params Guid[] directReportPersonIds);
 
         OrgChart? GetOrgChartFor(Guid personId, int numberOfLevels = 2);
 
@@ -37,43 +35,65 @@ namespace IntrepidProducts.OrgChart
             var count = 0;
             foreach (var person in persons)
             {
-                count = count + _repo.Create(person);
+                if (_repo.Create(person))
+                {
+                    count++;
+                }
             }
 
             return count;
         }
         public bool Update(Person person)
         {
-            throw new NotImplementedException();
+            return _repo.Update(person);
         }
 
         public bool Delete(Person person)
         {
-            throw new NotImplementedException();
+            return _repo.Delete(person);
         }
 
-        public bool RemoveManager(Person person, Guid managerId)
+        public bool RemoveManager(Person directReport)
         {
-            throw new NotImplementedException();
+            return _repo.RemoveManager(directReport.Id);
         }
 
-        public int ReplaceManager(Guid oldManagerId, Guid newManagerId)
+        public bool ReplaceManager(Guid oldManagerId, Guid newManagerId)
         {
-            throw new NotImplementedException();
+            var directReports = _repo.FindDirectReports(oldManagerId).ToList();
+            if (!directReports.Any())
+            {
+                return false;
+            }
+
+            var isSuccessful = true;
+
+            foreach (var directReport in directReports)
+            {
+                isSuccessful = RemoveManager(directReport);
+                if (!isSuccessful)
+                {
+                    break;
+                }
+
+                isSuccessful = AddDirectReports(newManagerId, directReport.Id) > 0;
+
+                if (!isSuccessful)
+                {
+                    break;
+                }
+            }
+
+            return isSuccessful;
         }
 
-        public int AddDirectReports(Person manager, params Person[] directReportPersons)
-        {
-            return AddDirectReports(manager, directReportPersons.Select(x => x.Id).ToArray());
-        }
-
-        public int AddDirectReports(Person manager, params Guid[] directReportPersonIds)
+        public int AddDirectReports(Guid managerId, params Guid[] directReportPersonIds)
         {
             var count = 0;
 
             foreach (var drIds in directReportPersonIds)
             {
-                var numberPersisted = _repo.PersistDirectReports(manager, drIds);
+                var numberPersisted = _repo.PersistDirectReports(managerId, drIds);
 
                 count = count + numberPersisted;
             }
@@ -106,7 +126,7 @@ namespace IntrepidProducts.OrgChart
 
         public Person? FindById(Guid id)
         {
-            throw new NotImplementedException();
+            return _repo.FindById(id);
         }
     }
 }
