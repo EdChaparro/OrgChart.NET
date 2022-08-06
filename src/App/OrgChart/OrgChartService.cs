@@ -117,7 +117,8 @@ namespace IntrepidProducts.OrgChart
                 ReportsTo = manager
             };
 
-            var directReports = _repo.FindDirectReports(personId);
+            var directReports = _repo.FindDirectReports(personId)
+                .Select(x => new OrgChart(x));
 
             orgChart.AddDirectReport(directReports.ToArray());
 

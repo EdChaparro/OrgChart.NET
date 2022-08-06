@@ -40,7 +40,7 @@ namespace IntrepidProducts.OrgChart.Tests
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
 
             Assert.IsTrue(orgChart.IsManager);
-            Assert.AreEqual(person, orgChart.DirectReports.First());
+            Assert.AreEqual(new OrgChart(person), orgChart.DirectReports.First());
         }
 
         [TestMethod]
@@ -212,7 +212,8 @@ namespace IntrepidProducts.OrgChart.Tests
             Assert.IsNotNull(orgChart);
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
             CollectionAssert.AreEqual
-                (new List<Person> {dr1, dr2}, orgChart.DirectReports.ToList());
+                (new List<OrgChart> {new OrgChart(dr1), new OrgChart(dr2)}, 
+                    orgChart.DirectReports.ToList());
 
             Assert.IsTrue(service.ReplaceManager(presentManager.Id, newManager.Id));
 
@@ -224,7 +225,8 @@ namespace IntrepidProducts.OrgChart.Tests
             Assert.IsNotNull(orgChart);
             Assert.IsTrue(orgChart.IsManager);
             CollectionAssert.AreEqual
-                (new List<Person> { dr1, dr2 }, orgChart.DirectReports.ToList());
+                (new List<OrgChart> { new OrgChart(dr1), new OrgChart(dr2) },
+                    orgChart.DirectReports.ToList());
 
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
         }

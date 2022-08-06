@@ -11,22 +11,22 @@ namespace IntrepidProducts.OrgChart
             ForPerson = person;
         }
 
-        public Person ForPerson { get; set; }
+        public Person ForPerson { get; }
 
         public int NumberOfLevels { get; set; }
 
         public Person? ReportsTo { get; set; }
 
         #region Direct Reports
-        private readonly List<Person> _directReports = new List<Person>();
-        public IEnumerable<Person> DirectReports => _directReports;
+        private readonly List<OrgChart> _directReports = new List<OrgChart>();
+        public IEnumerable<OrgChart> DirectReports => _directReports;
         public bool IsManager => DirectReports.Any();
 
         public int DirectReportCount => DirectReports.Count();
 
-        public bool AddDirectReport(params Person[] persons)
+        public bool AddDirectReport(params OrgChart[] orgChart)
         {
-            foreach (var person in persons)
+            foreach (var person in orgChart)
             {
                 if (!AddDirectReport(person))
                 {
@@ -37,17 +37,37 @@ namespace IntrepidProducts.OrgChart
             return true;
         }
 
-        private bool AddDirectReport(Person person)
+        private bool AddDirectReport(OrgChart orgChart)
         {
-            if (_directReports.Contains(person))
+            if (_directReports.Contains(orgChart))
             {
                 return false;
             }
 
-            _directReports.Add(person);
+            _directReports.Add(orgChart);
             return true;
         }
         #endregion
+
+        #region Equality
+        public override bool Equals(object? obj)
+        {
+            var otherEntity = obj as OrgChart;
+
+            return otherEntity != null && otherEntity.ForPerson.Id == ForPerson.Id;
+        }
+
+        protected bool Equals(OrgChart other)
+        {
+            return ForPerson.Equals(other.ForPerson);
+        }
+
+        public override int GetHashCode()
+        {
+            return ForPerson.Id.GetHashCode();
+        }
+        #endregion
+
 
         public override string ToString()
         {
