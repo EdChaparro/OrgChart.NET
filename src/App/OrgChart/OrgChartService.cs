@@ -101,7 +101,7 @@ namespace IntrepidProducts.OrgChart
             return count;
         }
 
-        public OrgChart? GetOrgChartFor(Guid personId, int numberOfLevels = 2)
+        public OrgChart? GetOrgChartFor(Guid personId, int numberOfLevels = 1)
         {
             var person = _repo.FindById(personId);
 
@@ -117,9 +117,31 @@ namespace IntrepidProducts.OrgChart
                 ReportsTo = manager
             };
 
-            var directReports = _repo.FindDirectReports(personId);
+            var directReports = _repo.FindDirectReports(personId).ToList();
 
-            orgChart.AddDirectReport(directReports.ToArray());
+            var currentLevel = 1;
+
+            while (currentLevel < numberOfLevels)
+            {
+                var isDirectReportAdded = false;
+
+                foreach (var directReport in directReports)
+                {
+                    var drOrgChart = (GetOrgChartFor(directReport.Id, (numberOfLevels - currentLevel)));
+
+                    if (drOrgChart != null)
+                    {
+                        isDirectReportAdded = orgChart.AddDirectReport(drOrgChart);
+                    }
+                }
+
+                if (!isDirectReportAdded)
+                {
+                    break;  //Nothing left to do
+                }
+
+                currentLevel++;
+            }
 
             return orgChart;
         }

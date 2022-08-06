@@ -11,24 +11,42 @@ namespace IntrepidProducts.OrgChart
             ForPerson = person;
         }
 
-        public Person ForPerson { get; set; }
+        public Person ForPerson { get; }
 
-        public int NumberOfLevels { get; set; }
+        public int NumberOfLevels => GetDirectReportDepth(this);
 
         public Person? ReportsTo { get; set; }
 
         #region Direct Reports
-        private readonly List<Person> _directReports = new List<Person>();
-        public IEnumerable<Person> DirectReports => _directReports;
+        private readonly List<OrgChart> _directReports = new List<OrgChart>();
+        public IEnumerable<OrgChart> DirectReports => _directReports;
         public bool IsManager => DirectReports.Any();
 
         public int DirectReportCount => DirectReports.Count();
 
-        public bool AddDirectReport(params Person[] persons)
+        private static int GetDirectReportDepth(OrgChart orgChart)
         {
-            foreach (var person in persons)
+            var depth = 1;
+            var drDepth = 0;
+
+            foreach (var directReport in orgChart.DirectReports.ToList())
             {
-                if (!AddDirectReport(person))
+                var nodeDepth = GetDirectReportDepth(directReport);
+
+                if (nodeDepth > drDepth)
+                {
+                    drDepth = nodeDepth;
+                }
+            }
+
+            return depth + drDepth;
+        }
+
+        public bool AddDirectReport(params OrgChart[] orgCharts)
+        {
+            foreach (var orgChart in orgCharts)
+            {
+                if (!AddDirectReport(orgChart))
                 {
                     return false;
                 }
@@ -37,17 +55,37 @@ namespace IntrepidProducts.OrgChart
             return true;
         }
 
-        private bool AddDirectReport(Person person)
+        private bool AddDirectReport(OrgChart orgChart)
         {
-            if (_directReports.Contains(person))
+            if (_directReports.Contains(orgChart))
             {
                 return false;
             }
 
-            _directReports.Add(person);
+            _directReports.Add(orgChart);
             return true;
         }
         #endregion
+
+        #region Equality
+        public override bool Equals(object? obj)
+        {
+            var otherEntity = obj as OrgChart;
+
+            return otherEntity != null && otherEntity.ForPerson.Id == ForPerson.Id;
+        }
+
+        protected bool Equals(OrgChart other)
+        {
+            return ForPerson.Equals(other.ForPerson);
+        }
+
+        public override int GetHashCode()
+        {
+            return ForPerson.Id.GetHashCode();
+        }
+        #endregion
+
 
         public override string ToString()
         {
