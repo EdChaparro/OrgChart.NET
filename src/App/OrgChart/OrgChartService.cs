@@ -44,7 +44,8 @@ namespace IntrepidProducts.OrgChart
         }
         public bool Update(Person person)
         {
-            throw new NotImplementedException();
+            var result = _repo.Update(person);
+            return result > 0;
         }
 
         public bool Delete(Person person)
@@ -106,7 +107,7 @@ namespace IntrepidProducts.OrgChart
 
         public Person? FindById(Guid id)
         {
-            throw new NotImplementedException();
+            return _repo.FindById(id);
         }
     }
 }

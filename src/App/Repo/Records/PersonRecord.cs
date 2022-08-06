@@ -14,6 +14,26 @@ namespace IntrepidProducts.Repo.Records
 
         public string? Title { get; set; }
 
+        #region Equality
+        public override bool Equals(object obj)
+        {
+            var record = obj as PersonRecord;
+
+            return record != null && record.Id == Id;
+        }
+
+        protected bool Equals(PersonRecord other)
+        {
+            return Id.Equals(other.Id);
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
+        }
+        #endregion
+
+
         public static PersonRecord Convert(Person entity)
         {
             return new PersonRecord

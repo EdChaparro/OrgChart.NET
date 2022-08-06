@@ -40,7 +40,15 @@ namespace IntrepidProducts.Repo
                 return 0;
             }
 
-            DbSet.Update(Convert(entity));
+            var isDetached = DbContextExtensions.DetachLocal
+                (this, Convert(entity), EntityState.Modified);
+
+            if (!isDetached)
+            {
+                return 0;
+            }
+
+            //DbSet.Update(Convert(entity)); //Removed due to EF tracking issues while testing
             return SaveChanges();
         }
 
