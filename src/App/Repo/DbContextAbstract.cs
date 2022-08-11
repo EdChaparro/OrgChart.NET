@@ -20,7 +20,6 @@ namespace IntrepidProducts.Repo
         { }
 
         protected abstract TRecord Convert(TEntity entity);
-        protected abstract TEntity Convert(TRecord record);
 
         protected virtual string DatabaseName => "Database";
 

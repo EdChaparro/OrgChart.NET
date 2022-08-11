@@ -30,7 +30,7 @@ namespace IntrepidProducts.Repo
             return PersonRecord.Convert(entity);
         }
 
-        protected override Person Convert(PersonRecord record)
+        protected Person Convert(PersonRecord record)
         {
             return PersonRecord.Convert(record);
         }
