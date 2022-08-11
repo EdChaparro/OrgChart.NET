@@ -5,6 +5,7 @@
     <AssemblyName>IntrepidProducts.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>IntrepidProducts.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
     <Nullable>enable</Nullable>
+    <Platforms>AnyCPU;X64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
