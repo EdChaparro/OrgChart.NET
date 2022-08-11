@@ -19,12 +19,12 @@ namespace IntrepidProducts.Repo.Entities
 
         public override bool IsValid()
         {
-            if (String.IsNullOrWhiteSpace(FirstName))
+            if (string.IsNullOrWhiteSpace(FirstName))
             {
                 return false;
             }
 
-            if (String.IsNullOrWhiteSpace(LastName))
+            if (string.IsNullOrWhiteSpace(LastName))
             {
                 return false;
             }
