@@ -28,7 +28,7 @@ namespace IntrepidProducts.Repo
         }
 
         #region Equality
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             var otherEntity = obj as EntityAbstract;
 
