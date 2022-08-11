@@ -9,6 +9,7 @@
 
     <RootNamespace>IntrepidProducts.OrgChart.Tests</RootNamespace>
     <Nullable>enable</Nullable>
+    <Platforms>AnyCPU;X64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

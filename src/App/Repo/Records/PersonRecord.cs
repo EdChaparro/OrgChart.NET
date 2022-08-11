@@ -15,7 +15,7 @@ namespace IntrepidProducts.Repo.Records
         public string? Title { get; set; }
 
         #region Equality
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             var record = obj as PersonRecord;
 

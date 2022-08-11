@@ -20,7 +20,7 @@ namespace IntrepidProducts.OrgChart.Tests
         }
 
         [TestMethod]
-        public void ShouldCalculateChartDepth()
+        public void ShouldStipulateChartDepth()
         {
             var ceo = new OrgChart(new Person
             {

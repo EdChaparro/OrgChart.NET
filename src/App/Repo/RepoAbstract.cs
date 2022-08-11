@@ -1,6 +1,6 @@
 ﻿namespace IntrepidProducts.Repo
 {
-    public interface IRepository<TEntity> where TEntity : class, IEntity
+    public interface IRepository<in TEntity> where TEntity : class, IEntity
     {
         bool Create(TEntity entity);
         bool Update(TEntity entity);
