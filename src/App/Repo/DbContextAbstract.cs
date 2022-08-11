@@ -24,7 +24,7 @@ namespace IntrepidProducts.Repo
 
         protected virtual string DatabaseName => "Database";
 
-        protected DbSet<TRecord> DbSet { get; set; }
+        protected DbSet<TRecord>? DbSet { get; set; }
 
         public virtual int Create(TEntity entity)
         {
