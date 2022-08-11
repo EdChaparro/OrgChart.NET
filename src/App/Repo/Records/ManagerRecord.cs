@@ -1,5 +1,4 @@
 ﻿using System;
-using IntrepidProducts.Repo.Entities;
 
 namespace IntrepidProducts.Repo.Records
 {
@@ -29,15 +28,6 @@ namespace IntrepidProducts.Repo.Records
         public override int GetHashCode()
         {
             return HashCode.Combine(ManagerPersonId, DirectReportPersonId);
-        }
-
-        public static ManagerRecord? Convert(Person manager, Person directReport)
-        {
-            return new ManagerRecord
-            {
-                ManagerPersonId = manager.Id,
-                DirectReportPersonId = directReport.Id
-            };
         }
     }
 }
